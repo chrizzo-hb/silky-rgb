@@ -61,7 +61,7 @@ class Device:
         self.CACHED_BYTESTREAM = None
 
     def recall(self, key):
-        if key in self.CACHE:
+        if key is not None and key in self.CACHE:
             self.CACHED_BYTESTREAM = self.CACHE[key]
             if self.CACHE_LAST_KEY == key:
                 self.CACHE_SKIP = True

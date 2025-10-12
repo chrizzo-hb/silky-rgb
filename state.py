@@ -73,20 +73,41 @@ class RGBState:
                     if event.timer == 0:
                         self.events.pop(0)
             if event.type == EventType.AddLayer:
-                running = False
-                for i in range(len(self.modes)):
-                    if self.modes[i].__class__ is STATES[event.payload]['class']:
-                        running = True
-                if not running:
-                    self.modes.append(STATES[event.payload]['class'](self.DEV, self._tick))
-                self.events.pop(0)
-            if event.type == EventType.RemoveLayer:
-                for i in range(len(self.modes)):
-                    if self.modes[i].__class__ is STATES[event.payload]['class']:
-                        self.modes.pop(i)
+                if not event.running:
+                    running = False
+                    for i in range(len(self.modes)):
+                        if self.modes[i].__class__ is STATES[event.payload]['class']:
+                            running = True
+                    if not running:
+                        event.running = True
+                        self._target_tr = 0
                         self.DEV.nuke_savestates()
-                        self._target_tr = MAX_BR
-                self.events.pop(0)
+                    else:
+                        self.events.pop(0)
+                if event.running and self._tr == 0:
+                    self.modes.append(STATES[event.payload]['class'](self.DEV, self._tick))
+                    self.events.pop(0)
+                    self._target_tr = MAX_BR
+
+            if event.type == EventType.RemoveLayer:
+                if not event.running:
+                    for i in range(len(self.modes)):
+                        if self.modes[i].__class__ is STATES[event.payload]['class']:
+                            event.running = True
+                            self._target_tr = 0
+                
+                if not event.running:
+                    self.events.pop(0)
+
+                if event.running and self._tr == 0:
+                    self.events.pop(0)
+                    for i in range(len(self.modes)):
+                        if self.modes[i].__class__ is STATES[event.payload]['class']:
+                            self.modes.pop(i)
+                    self.DEV.nuke_savestates()
+                    self._target_tr = MAX_BR
+
+
             if event.type == EventType.ChangeMode:
                 self.modes[0] = MODES[event.payload]['class'](self.DEV, self._tick)
                 self._tr = 0

@@ -13,40 +13,46 @@ CONFIG = {
     "speed": 0
 }
 
-palettes = [
-    # --- High Contrast (Color + Neutral) ---
-    ["PRed", "White"],
-    ["PBlue", "Black"],
-    ["Yellow", "Black"],
-    ["Magenta", "White"],
-    ["Cyan", "Black"],
-    ["Green", "White"],
-    ["Orange", "Black"],
-    ["Violet", "Silver"],
-    ["Gold", "Black"],
-    ["Pink", "Silver"],
+palettes = {
+    # Warm & Fiery
+    'Flame': ['Red', 'Orange'],
+    'Sunset': ['Hot Pink', 'Tangerine'],
+    'Volcano': ['PRed', 'Black'],
+    'Crimson Gold': ['Crimson', 'Gold'],
+    'Golden Hour': ['Goldenrod', 'Warm White'],
+    #probably merge flame and crimson gold
 
-    # --- Complementary & Contrasting Hues ---
-    ["Orange", "Blue"],
-    ["Red", "Cyan"],
-    ["Green", "Magenta"],
-    ["Yellow", "Violet"],
-    ["Gold", "PBlue"],
+    # Cool & Serene
+    'Ocean Deep': ['Blue', 'Teal'],
+    'Glacier': ['White', 'Cyan'],
+    'Amethyst Haze': ['Amethyst', 'Deep Purple'], # small diff
+    'Lagoon': ['Turquoise', 'Spring Green'],
+    'Night Sky': ['PBlue', 'Silver'], #cool dark palette
 
-    # --- Analogous & Similar Hues ---
-    ["Cyan", "Aqua"],
-    ["Green", "Mint"],
-    ["Red", "Pink"],
-    ["Orange", "Gold"],
-    ["Blue", "Violet"],
+    # Vibrant & Electric
+    'Cyberpunk': ['Magenta', 'Cyan'],
+    'Synthwave': ['Electric Blue', 'Hot Pink'],
+    'Matrix': ['Lime Green', 'Black'],
+    'Fuchsia Flash': ['Fuchsia', 'Electric Blue'], #probably redundant
+    'Scarlet Surge': ['Scarlet', 'Aqua'],
+
+    # Natural & Earthy
+    'Forest': ['Green', 'Emerald'],
+    'Spring Meadow': ['Spring Green', 'Yellow'],
+    'Mint Chip': ['Mint', 'Silver'],
+    'Orchid': ['Magenta', 'Violet'],
     
-    # --- Other Vibrant Pairings ---
-    ["Magenta", "Aqua"],
-    ["Pink", "Mint"],
-    ["Red", "Gold"],
-    ["PBlue", "Yellow"],
-    ["Violet", "Pink"],
-]
+    # Fun & Sweet
+    'Cotton Candy': ['Pink', 'Sky Blue'],
+    'Lemon Lime': ['Lime Green', 'Yellow'], #basically spling meadow
+    'Bubblegum': ['Pink', 'Aqua'], # there are a few like this
+    'Tangerine Dream': ['Tangerine', 'White'],
+    
+    # Regal & Rich
+    'Royalty': ['Violet', 'Gold'],
+    'Emerald City': ['Emerald', 'Goldenrod'],
+    'Prestige': ['Deep Purple', 'Silver']
+}
 
 KEY_LED_MODE="led.mode"
 KEY_LED_BRIGHTNESS="led.brightness"
@@ -93,7 +99,7 @@ def refresh(key:str|None=None):
         
         if key is None or key == KEY_LED_COLOUR:
             val1, val2, val3 = [int(x) for x in get_param(KEY_LED_COLOUR).split()]
-            sp = palettes[(val1//10)%len(palettes)]
+            sp = palettes[list(palettes.keys())[(val1//10)%len(palettes)]]
             CONFIG['palette'] = get_palette('-'.join(sp))
             CONFIG['palette_swap'] = val2 > 0
             CONFIG['palette_swap_secondary'] = val3 > 0

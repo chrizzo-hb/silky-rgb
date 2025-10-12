@@ -24,7 +24,7 @@ class Effect(BaseEffect):
             s = self.ST[r.ID]
             zd = self.ZD[r.ID]
             for x in range(r.COUNT):
-                d = (100 - abs(loop_d(r.ANGLES[x], s['angle'], 360))) / 100
+                d = (80 - abs(loop_d(r.ANGLES[x], s['angle'], 360))) / 80
                 if d > 0 and s['value'] > 0.3:
                     d2 = d * d * ((s['value']-0.3)/0.7)
                     zd[x] = min(d*100, zd[x] + d2*30)
@@ -39,8 +39,8 @@ class Effect(BaseEffect):
             zd = self.ZD[r.ID]
 
             for x in range(r.COUNT):
-                p_ = (zd[x] / 100)**0.5
+                p_ = (zd[x] / 100)**0.4
                 r[x] = mix(p.fg, p_, p.bg, self.bg_scale*(1-p_))
     
     def framekey(self, t):
-        return 0 if self.zeroes == self.leds else t
+        return 0 if self.zeroes == self.leds else None
