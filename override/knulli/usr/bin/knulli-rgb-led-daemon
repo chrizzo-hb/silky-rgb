@@ -61,9 +61,8 @@ while true; do
     # Check display brightness every 10 seconds
     if [ $((start_time % 5)) -eq 0 ]; then
         BRIGHTNESS=$(batocera-brightness)
-        if [ $(batocera-settings-get "led.brightness.adaptive") -eq 1 ]; then
-            batocera-settings-set led.brightness "$BRIGHTNESS"
-        fi
+        echo "Screen state: $BRIGHTNESS"
+        curl -s "$DAEMON_CURL_URL/update-screen-state" -d "$BRIGHTNESS"
     fi
     
     # Sleep for 1 second to avoid a busy loop, the modulo checks handle the timing

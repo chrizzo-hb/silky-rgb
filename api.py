@@ -1,5 +1,6 @@
 from bottle import run, route, get, request
 from colors import BLUE, GREEN, RED, Palette
+from confloader import CONFIG
 from state import RGBState, Event, EventType
 from utilities import hex_to_rgb
 from copy import deepcopy
@@ -62,12 +63,13 @@ def battery():
 
     last_state = STATE.DEV.BATTERY['state']
 
-    if False: # notification mode
+    if not CONFIG['charging_notification']: # notification mode
         if req[1] != last_state and req[1] == 'Charging':
             run_preset_effect(presets['battery_charging'])
         if req[1] != last_state and req[1] == 'Full':
             run_preset_effect(presets['battery_full'])
-        STATE.DEV.BATTERY['state'] = req[1]
+        if req[1] != last_state:
+            STATE.events.append(Event(EventType.RemoveLayer, 'charging'))
     else:
         if req[1] != last_state:
             if req[1] == 'Charging':
@@ -75,10 +77,17 @@ def battery():
             else:
                 STATE.events.append(Event(EventType.RemoveLayer, 'charging'))
 
+    STATE.DEV.BATTERY['state'] = req[1]
 
 @route("/update-screen-state", method='POST')
 def screen():
-    pass
+    req = request.body.read().decode() # pyright: ignore[reportAttributeAccessIssue]
+
+    if CONFIG['adaptive_brightness']:
+        if(STATE._target_sc != int(req)):
+            STATE._target_sc = int(req)
+            STATE.DEV.nuke_savestates()
+            STATE._idle = False
 
 @get("/kill")
 def kill():

@@ -7,6 +7,7 @@ CONFIG = {
     "fps": 30,
     "mode": "null",
     "brightness": 100,
+    "adaptive_brightness": False,
     "palette": [[0, 0, 0], [0, 0, 0]],
     "palette_swap": False,
     "palette_swap_secondary": False,
@@ -85,13 +86,23 @@ def identify_device():
     return board
 
 def get_param(key):
-    return os.popen('batocera-settings-get '+key).read().strip()
+    ret = os.popen('batocera-settings-get '+key).read().strip()
+    print('read knulli option:', key, '| val:', ret)
+    return ret
 
 def refresh(key:str|None=None):
     try:
         if key is None or key == KEY_LED_MODE:
             val = get_param(KEY_LED_MODE)
             CONFIG['mode'] = mode_map[val]
+
+        if key is None or key == KEY_LED_BRIGHTNESS_ADAPTIVE:
+            val = get_param(KEY_LED_BRIGHTNESS_ADAPTIVE)
+            CONFIG['adaptive_brightness'] = val == '1'
+
+        if key is None or key == KEY_LED_BATTERY_CHARGING_ENABLED:
+            val = get_param(KEY_LED_BATTERY_CHARGING_ENABLED)
+            CONFIG['charging_notification'] = val == '1'
         
         if key is None or key == KEY_LED_BRIGHTNESS:
             val = get_param(KEY_LED_BRIGHTNESS)

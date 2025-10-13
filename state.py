@@ -14,10 +14,12 @@ class RGBState:
         self.DEV = Device()
         self._br = 100
         self._tr = 100
+        self._sc = 100
         self._palette = [Palette([0,0,0], [0,0,0]), Palette([0,0,0], [0,0,0])]
         self._target_palette = [Palette([0,0,0], [0,0,0]), Palette([0,0,0], [0,0,0])]
         self._target_br = 100
         self._target_tr = 100
+        self._target_sc = 100
 
         # Flip true if config changes
         self._idle = False
@@ -185,9 +187,11 @@ class RGBState:
             self._target_palette = [p.swap() for p in self._target_palette]
         if CONFIG['palette_swap_secondary']:
             self._target_palette[1] = self._target_palette[1].swap()
+        if not CONFIG['adaptive_brightness']:
+            self._target_sc = MAX_BR
     
     def apply_brightness(self):
-        self.DEV.BR = self._tr*self._br*self._br *self._br / (100**4)
+        self.DEV.BR = self._tr*self._br*self._br*self._br*self._sc / (100**5)
 
     def smooth_conf(self):
 
@@ -198,6 +202,10 @@ class RGBState:
         
         if self._br != self._target_br:
             self._br += -1 if self._target_br < self._br else 1
+            done = False
+
+        if self._sc != self._target_sc:
+            self._sc += -1 if self._target_sc < self._sc else 1
             done = False
 
         if self._tr != self._target_tr:

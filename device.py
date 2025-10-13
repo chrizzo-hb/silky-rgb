@@ -16,7 +16,7 @@ class Device:
         self.LED_COUNT = config['leds']
 
         self.FB0 = [0, 0, 0] * config['leds']
-        self.BR:float = 100
+        self.BR:float = 1
 
         self.BATTERY = {
             'percentage': 0,
@@ -71,7 +71,8 @@ class Device:
         return False
 
     def render(self):
-        return self.driver.render([int(a*a*self.BR*255+0.49) for a in self.FB0])
+        brc = self.BR*255+0.49
+        return self.driver.render([int(a*a*brc) for a in self.FB0])
         
     def write(self) -> None:
         bytestream = self.CACHED_BYTESTREAM
