@@ -2,7 +2,7 @@ from effects._base_effect import BaseEffect
 from device import Device
 
 _metadata = {
-    'name': 'Empty',
+    'name': 'Off',
     'reqs': []
 }
 

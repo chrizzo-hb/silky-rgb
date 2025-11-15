@@ -1,9 +1,11 @@
 from bottle import run, route, get, request
-from colors import BLUE, GREEN, RED, Palette
-from confloader import CONFIG
+from colors import BLUE, GREEN, PALETTES, RED, Palette
+from confloader import CONFIG, conf_map, reload, set_option
+from effects.effect_store import MODES
 from state import RGBState, Event, EventType
 from utilities import hex_to_rgb
 from copy import deepcopy
+from json import dumps
 
 STATE = RGBState.get()
 
@@ -31,9 +33,17 @@ def run_preset_effect(preset):
     STATE.events.append(Event(EventType.FadeIn))
 
 @route("/reload-config")
-def json():
+def reload():
+    reload()
     STATE.events.append(Event(EventType.LoadConfig))
     return ""
+
+@route("/set-config", method='POST')
+def set_config():
+    req = request.body.read().decode().split() # pyright: ignore[reportAttributeAccessIssue]
+    set_option(req[0], req[1])
+    STATE.events.append(Event(EventType.LoadConfig))
+    return f"[{req[0]}]: {req[1]}\n"
 
 @route("/animation", method='POST')
 def animation():
@@ -94,6 +104,28 @@ def kill():
     STATE.events.append(Event(EventType.FadeOut))
     STATE.events.append(Event(EventType.Die))
 
+@get("/get-settings")
+def settings():
+    return dumps(conf_map, indent=4)+"\n"
+
+@get("/get-modes")
+def get_modes():
+    m = {}
+    for k, v in MODES.items():
+        m[k] = {
+            "name": v["metadata"]["name"]
+        }
+    return dumps(m, indent=4)+"\n"
+
+@get("/get-palettes")
+def get_palettes():
+    p = {}
+    for k, v1 in PALETTES.items():
+        p[k] = {
+            "name": f"{k} ({v1[0]}-{v1[1]})"
+        }
+
+    return dumps(p, indent=4)+"\n"
 
 def run_api():
     run(host='localhost', port=1235)

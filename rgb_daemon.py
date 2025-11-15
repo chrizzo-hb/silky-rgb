@@ -1,3 +1,4 @@
+import device
 from time import time_ns, sleep
 import threading
 from api import run_api

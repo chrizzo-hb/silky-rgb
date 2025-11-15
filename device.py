@@ -1,9 +1,19 @@
 import json
-import confloader
 import os
 from importlib import import_module
 
-config = json.load(open('device_configs/'+confloader.identify_device()+'.json'))
+def identify_device():
+    board = ""
+
+    try:
+        with open('/boot/boot/knulli.board', 'r') as f:
+            board = f.read().strip()
+    except (IOError, FileNotFoundError):
+        pass
+
+    return board
+
+config = json.load(open('device_configs/'+identify_device()+'.json'))
 
 RGBDriver = import_module("drivers."+config['driver']).RGBDriver
 

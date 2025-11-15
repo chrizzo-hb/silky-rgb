@@ -1,11 +1,11 @@
 from enum import Enum
 import json
-from colors import BLUE, GREEN, RED, WHITE, Palette
+from colors import BLUE, GREEN, RED, WHITE, PALETTES, Palette, get_palette
 from device import Device
 from effects.effect_store import MODES, NOTIS, STATES
 from effects._base_effect import BaseEffect
 from utilities import generate_brightness_list
-from confloader import CONFIG, refresh as conf_refresh
+from confloader import CONFIG
 
 MAX_BR = 100
 
@@ -50,7 +50,7 @@ class RGBState:
 
     def manage_events(self):
         if len(self.events) > 0:
-            print([f"{a.type.name}/{a.payload}: {a.timer} {a.running}" for a in self.events])
+            #print([f"{a.type.name}/{a.payload}: {a.timer} {a.running}" for a in self.events])
             self._idle = False
             event = self.events[0]
             if event.type == EventType.LoadConfig:
@@ -167,7 +167,6 @@ class RGBState:
         self.DEV.write()
     
     def load_config(self):
-        conf_refresh()
 
         print(CONFIG)
         self.DEV.nuke_savestates()
@@ -179,15 +178,16 @@ class RGBState:
             self.events.append(Event(EventType.FadeIn))
             self._mode = CONFIG['mode']
 
-        self._target_br = CONFIG['brightness']
+        self._target_br = 40 + int(CONFIG['brightness']*10 * 0.6) 
 
-        raw_palette = CONFIG['palette']
+        raw_palette = get_palette('-'.join(PALETTES[CONFIG['palette']]))
+        print(raw_palette)
         self._target_palette = [Palette(*raw_palette), Palette(*raw_palette)]
-        if CONFIG['palette_swap']:
+        if CONFIG['palette.swap']:
             self._target_palette = [p.swap() for p in self._target_palette]
-        if CONFIG['palette_swap_secondary']:
+        if CONFIG['palette.secondary']:
             self._target_palette[1] = self._target_palette[1].swap()
-        if not CONFIG['adaptive_brightness']:
+        if not CONFIG['brightness.adaptive']:
             self._target_sc = MAX_BR
     
     def apply_brightness(self):

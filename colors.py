@@ -86,10 +86,52 @@ colors = {
     'Goldenrod': [0.8549, 0.6471, 0.1255],
     'Warm White': [1.0, 0.9608, 0.902],
     'Ice White': [0.902, 0.9804, 1.0],
+    'Knulli': [1, 1, 0.5],
     'Off': [0.0, 0.0, 0.0]              # Same as Black
 }
 
-def get_palette(S):
+PALETTES = {
+    # Warm & Fiery
+    'Flame': ['Red', 'Orange'],
+    'Sunset': ['Hot Pink', 'Tangerine'],
+    'Volcano': ['PRed', 'Black'],
+    'Crimson Gold': ['Crimson', 'Gold'],
+    'Golden Hour': ['Goldenrod', 'Warm White'],
+    #probably merge flame and crimson gold
+
+    # Cool & Serene
+    'Ocean Deep': ['Blue', 'Teal'],
+    'Glacier': ['White', 'Cyan'],
+    'Amethyst Haze': ['Amethyst', 'Deep Purple'], # small diff
+    'Lagoon': ['Turquoise', 'Spring Green'],
+    'Night Sky': ['PBlue', 'Silver'], #cool dark palette
+
+    # Vibrant & Electric
+    'Cyberpunk': ['Magenta', 'Cyan'],
+    'Synthwave': ['Electric Blue', 'Hot Pink'],
+    'Matrix': ['Lime Green', 'Black'],
+    'Fuchsia Flash': ['Fuchsia', 'Electric Blue'], #probably redundant
+    'Scarlet Surge': ['Scarlet', 'Aqua'],
+
+    # Natural & Earthy
+    'Knulli': ['Knulli', 'Silver'],
+    'Spring Meadow': ['Spring Green', 'Yellow'],
+    'Mint Chip': ['Mint', 'Silver'],
+    'Orchid': ['Magenta', 'Violet'],
+    
+    # Fun & Sweet
+    'Cotton Candy': ['Pink', 'Sky Blue'],
+    'Lemon Lime': ['Lime Green', 'Yellow'], #basically spling meadow
+    'Bubblegum': ['Pink', 'Aqua'], # there are a few like this
+    'Tangerine Dream': ['Tangerine', 'White'],
+    
+    # Regal & Rich
+    'Royalty': ['Violet', 'Gold'],
+    'Emerald City': ['Emerald', 'Goldenrod'],
+    'Prestige': ['Deep Purple', 'Silver']
+}
+
+def get_palette(S:str) -> list[Color]:
     colors_ = S.split("-")
     if(len(colors_) == 1):
         c1 = colors_[0]
@@ -100,3 +142,4 @@ def get_palette(S):
         c2 = colors_[1]
         ret = [colors[c1], colors[c2]]
         return ret
+    return [[0,0,0], [0,0,0]]
