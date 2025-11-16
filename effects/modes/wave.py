@@ -4,7 +4,7 @@ from utilities import mix, dimm, sin100
 
 _metadata = {
     'name': 'Wave',
-    'reqs': []
+    'reqs': ['has_ring']
 }
 
 class Effect(BaseEffect):

@@ -4,7 +4,7 @@ from utilities import color_upscale, hsv_fl
 
 _metadata = {
     'name': 'Rainbow',
-    'reqs': []
+    'reqs': ['high_res']
 }
 
 class Effect(BaseEffect):

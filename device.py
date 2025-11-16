@@ -33,6 +33,8 @@ class Device:
             'state': ''
         }
 
+        self.TRAITS = []
+
         self.nuke_savestates()
     
         self.driver = RGBDriver(config.get('driver_extra_params', {})) # pyright: ignore[reportPossiblyUnboundVariable]
@@ -54,10 +56,27 @@ class Device:
             zone_config = config['zones'][zone_id]
             if zone_config['type'] == 'Ring':
                 self.Z.Rings.append(RingZone(self, zone_config))
+            if zone_config['type'] == 'Line':
+                self.Z.Lines.append(LineZone(self, zone_config))
             if zone_config['type'] == 'Led':
                 self.Z.Leds.append(LineZone(self, zone_config))
 
-        self.A = self.Z.Leds + self.Z.Rings
+        self.A = self.Z.Leds + self.Z.Lines + self.Z.Rings
+
+        # calculate capabilities
+        if len(self.Z.Rings) > 0:
+            self.TRAITS.append('has_ring')
+        if len(list(filter(lambda a: a.PAL_ID == 1, self.A))) > 0:
+            self.TRAITS.append('has_secondary')
+        if len(list(filter(lambda a: a.COUNT > 6, self.A))):
+            self.TRAITS.append('high_res')
+        if len(list(filter(lambda a: "input" in a, self.CONFIG["zones"].values()))):
+            self.TRAITS.append('has_input')
+
+        print("\nCalculated Device Traits:")
+        for i in self.TRAITS:
+            print(f"    {i}")
+
 
     def savestate(self, key):
         self.CACHED_BYTESTREAM = self.render()

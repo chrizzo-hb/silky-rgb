@@ -5,7 +5,9 @@ from device import Device
 from effects.effect_store import MODES, NOTIS, STATES
 from effects._base_effect import BaseEffect
 from utilities import generate_brightness_list
-from confloader import CONFIG
+from confloader import CONFIG, read_config_knulli
+
+read_config_knulli()
 
 MAX_BR = 100
 
@@ -168,7 +170,10 @@ class RGBState:
     
     def load_config(self):
 
-        print(CONFIG)
+        print("\n(Re)Loaded Config:")
+        for k, v in CONFIG.items():
+            print(f"    [{k}]: {v}")
+
         self.DEV.nuke_savestates()
 
         if CONFIG['mode'] != self._mode:
@@ -181,7 +186,6 @@ class RGBState:
         self._target_br = 40 + int(CONFIG['brightness']*10 * 0.6) 
 
         raw_palette = get_palette('-'.join(PALETTES[CONFIG['palette']]))
-        print(raw_palette)
         self._target_palette = [Palette(*raw_palette), Palette(*raw_palette)]
         if CONFIG['palette.swap']:
             self._target_palette = [p.swap() for p in self._target_palette]

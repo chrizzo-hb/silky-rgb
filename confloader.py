@@ -11,26 +11,48 @@ CONFIG = {
     "brightness.adaptive": False,
     "palette": "Knulli",
     "palette.swap": False,
-    "palette.secondary": False
+    "palette.secondary": False,
+    "retroachievements": True,
+    "battery.low": "notification",
+    "battery.low.threshold": 20,
+    "battery.charging": "notification",
 }
 
 conf_map = {
     "mode": {
-        "type": "string",
-        "available": True
+        "type": "string"
     },
     "brightness": {
         "type": "int",
-        "range": [0,10],
-        "available": True
+        "range": [0,10]
     },
     "brightness.adaptive": {
-        "type": "bool",
-        "available": True
+        "type": "bool"
     },
     "palette": {
-        "type": "string",
-        "available": True
+        "type": "string"
+    },
+    "palette.swap": {
+        "type": "bool"
+    },
+    "palette.secondary": {
+        "type": "bool",
+        "reqs": ['has_secondary']
+    },
+    "retroachievements": {
+        "type": "bool"
+    },
+    "battery.low": {
+        "type": "enum",
+        "values": ["off", "notification", "continous"]
+    },
+    "battery.low.threshold": {
+        "type": "int",
+        "range": [0,30]
+    },
+    "battery.charging": {
+        "type": "enum",
+        "values": ["off", "notification", "continous"]
     }
 }
 
@@ -39,10 +61,10 @@ for k in conf_map:
 
 def get_param(key):
     ret = os.popen('knulli-settings-get '+"led."+key).read().strip()
-    print('read knulli option:', key, '| val:', ret)
+    #print('read knulli option:', key, '| val:', ret)
     return ret
 
-def reload():
+def read_config_knulli():
     for k in conf_map:
         set_option(k, get_param(k))
 
@@ -61,7 +83,7 @@ def set_option(key:str, val:str):
                 CONFIG["brightness"] = int(val)
 
         if key == "brightness.adaptive":
-            CONFIG['adaptive_brightness'] = val == '1'
+            CONFIG["brightness.adaptive"] = val == '1'
 
     except:
         pass

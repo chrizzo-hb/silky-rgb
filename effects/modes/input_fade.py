@@ -5,7 +5,7 @@ from utilities import loop_d, mix, dimm
 
 _metadata = {
     'name': 'Input Fade',
-    'reqs': []
+    'reqs': ['has_input']
 }
 
 class Effect(BaseEffect):

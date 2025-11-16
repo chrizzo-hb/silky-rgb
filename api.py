@@ -1,6 +1,6 @@
 from bottle import run, route, get, request
 from colors import BLUE, GREEN, PALETTES, RED, Palette
-from confloader import CONFIG, conf_map, reload, set_option
+from confloader import CONFIG, conf_map, read_config_knulli, set_option
 from effects.effect_store import MODES
 from state import RGBState, Event, EventType
 from utilities import hex_to_rgb
@@ -33,14 +33,14 @@ def run_preset_effect(preset):
     STATE.events.append(Event(EventType.FadeIn))
 
 @route("/reload-config")
-def reload():
-    reload()
+def reload_config():
+    read_config_knulli()
     STATE.events.append(Event(EventType.LoadConfig))
     return ""
 
 @route("/set-config", method='POST')
 def set_config():
-    req = request.body.read().decode().split() # pyright: ignore[reportAttributeAccessIssue]
+    req = request.body.read().decode().split(' ', maxsplit=1) # pyright: ignore[reportAttributeAccessIssue]
     set_option(req[0], req[1])
     STATE.events.append(Event(EventType.LoadConfig))
     return f"[{req[0]}]: {req[1]}\n"
@@ -106,15 +106,31 @@ def kill():
 
 @get("/get-settings")
 def settings():
+    c = {}
+    for k, v in conf_map.items():
+        add = True
+        if "reqs" in v:
+            for r in v["reqs"]:
+                if r not in STATE.DEV.TRAITS:
+                    add = False
+        if add:
+            c[k] = v
+
     return dumps(conf_map, indent=4)+"\n"
 
 @get("/get-modes")
 def get_modes():
     m = {}
     for k, v in MODES.items():
-        m[k] = {
-            "name": v["metadata"]["name"]
-        }
+        add = True
+        if "reqs" in v["metadata"]:
+            for r in v["metadata"]["reqs"]:
+                if r not in STATE.DEV.TRAITS:
+                    add = False
+        if add:
+            m[k] = {
+                "name": v["metadata"]["name"]
+            }
     return dumps(m, indent=4)+"\n"
 
 @get("/get-palettes")
@@ -122,13 +138,14 @@ def get_palettes():
     p = {}
     for k, v1 in PALETTES.items():
         p[k] = {
-            "name": f"{k} ({v1[0]}-{v1[1]})"
+            "name": f"{k} ({v1[0]}, {v1[1]})"
         }
 
     return dumps(p, indent=4)+"\n"
 
 def run_api():
-    run(host='localhost', port=1235)
+    print("Starting HTTP Daemon: http://localhost:1235/")
+    run(host='localhost', port=1235, quiet=True)
 
 if __name__ == '__main__':
     run_api()
