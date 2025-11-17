@@ -189,7 +189,7 @@ class RGBState:
         self._target_palette = [Palette(*raw_palette), Palette(*raw_palette)]
         if CONFIG['palette.swap']:
             self._target_palette = [p.swap() for p in self._target_palette]
-        if CONFIG['palette.secondary']:
+        if CONFIG['palette.swap.secondary']:
             self._target_palette[1] = self._target_palette[1].swap()
         if not CONFIG['brightness.adaptive']:
             self._target_sc = MAX_BR

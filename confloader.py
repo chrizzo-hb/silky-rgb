@@ -11,7 +11,7 @@ CONFIG = {
     "brightness.adaptive": False,
     "palette": "Knulli",
     "palette.swap": False,
-    "palette.secondary": False,
+    "palette.swap.secondary": False,
     "retroachievements": True,
     "battery.low": "notification",
     "battery.low.threshold": 20,
@@ -35,7 +35,7 @@ conf_map = {
     "palette.swap": {
         "type": "bool"
     },
-    "palette.secondary": {
+    "palette.swap.secondary": {
         "type": "bool",
         "reqs": ['has_secondary']
     },
@@ -68,6 +68,9 @@ def read_config_knulli():
     for k in conf_map:
         set_option(k, get_param(k))
 
+def bounds(val, bounds):
+    return bounds[0] <= val <= bounds[1]
+
 def set_option(key:str, val:str):
     try:
         if key == "mode":
@@ -79,11 +82,17 @@ def set_option(key:str, val:str):
                 CONFIG["palette"] = val
 
         if key == "brightness":
-            if val.isnumeric():
+            if val.isnumeric() and bounds(int(val), conf_map['brightness']['range']):
                 CONFIG["brightness"] = int(val)
 
         if key == "brightness.adaptive":
-            CONFIG["brightness.adaptive"] = val == '1'
+            CONFIG["brightness.adaptive"] = val == 'true'
+
+        if key == "palette.swap":
+            CONFIG["palette.swap"] = val == 'true'
+
+        if key == "palette.swap.secondary":
+            CONFIG["palette.swap.secondary"] = val == 'true'
 
     except:
         pass

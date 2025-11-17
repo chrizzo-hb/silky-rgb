@@ -3,7 +3,7 @@ from device import Device
 import os
 
 _metadata = {
-    'name': 'Framebuffer',
+    'name': 'Screen Aura',
     'reqs': []
 }
 

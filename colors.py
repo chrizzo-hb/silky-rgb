@@ -86,7 +86,7 @@ colors = {
     'Goldenrod': [0.8549, 0.6471, 0.1255],
     'Warm White': [1.0, 0.9608, 0.902],
     'Ice White': [0.902, 0.9804, 1.0],
-    'Knulli': [1, 1, 0.5],
+    'Knulli': [0.65, 1, 0],
     'Off': [0.0, 0.0, 0.0]              # Same as Black
 }
 

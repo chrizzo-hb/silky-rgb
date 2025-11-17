@@ -4,7 +4,7 @@ from joystick import StickState
 from utilities import loop_d, mix, dimm
 
 _metadata = {
-    'name': 'Input Fade',
+    'name': 'Input Pulse',
     'reqs': ['has_input']
 }
 
