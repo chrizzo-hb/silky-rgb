@@ -86,13 +86,13 @@ def set_option(key:str, val:str):
                 CONFIG["brightness"] = int(val)
 
         if key == "brightness.adaptive":
-            CONFIG["brightness.adaptive"] = val == 'true'
+            CONFIG["brightness.adaptive"] = val == '1'
 
         if key == "palette.swap":
-            CONFIG["palette.swap"] = val == 'true'
+            CONFIG["palette.swap"] = val == '1'
 
         if key == "palette.swap.secondary":
-            CONFIG["palette.swap.secondary"] = val == 'true'
+            CONFIG["palette.swap.secondary"] = val == '1'
 
     except:
         pass
