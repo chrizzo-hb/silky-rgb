@@ -27,9 +27,9 @@ class Effect(BaseEffect):
                 t_ = ((t/2+7*z._ind[i]) / 30) % self.shimmer_density
                 if int(t_) == self.shimmer_table_[i]:
                     prog = sin100(int((t_%1)*100))
-                    z[i] = mix(p.bg, 0.3-prog*0.3, p.fg, prog)
+                    z[i] = mix(p.bg, 0.5-prog*0.5, p.fg, prog)
                 else:
-                    z[i] = dimm(p.bg, 0.3)
+                    z[i] = dimm(p.bg, 0.5)
     
     def framekey(self, t):
         return ((t/2) / 30) % self.shimmer_density
