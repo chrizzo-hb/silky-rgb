@@ -1,5 +1,5 @@
 from bottle import run, route, get, request
-from colors import BLUE, GREEN, PALETTES, RED, Palette
+from colors import AMBER, BLUE, GREEN, PALETTES, RED, WHITE, Palette
 from confloader import CONFIG, conf_map, read_config_knulli, set_option
 from effects.effect_store import MODES
 from state import RGBState, Event, EventType
@@ -13,12 +13,24 @@ presets = {
     'battery_charging': [
         Event(EventType.Notification, 'up', 3, GREEN),
     ],
+    'battery_discharging1': [
+        Event(EventType.Notification, 'down', 1, RED),
+    ],
+    'battery_discharging2': [
+        Event(EventType.Notification, 'down', 1, Palette([1,0.7,0])),
+    ],
+    'battery_discharging3': [
+        Event(EventType.Notification, 'down', 1, GREEN),
+    ],
     'battery_full': [
         Event(EventType.Notification, 'up', 1, GREEN),
         Event(EventType.Notification, 'round', 1, GREEN),
         Event(EventType.Notification, 'blink_off', 1, GREEN),
     ],
-    'battery_low': [
+    'battery_low1': [
+        Event(EventType.Notification, 'blink', 2, AMBER),
+    ],
+    'battery_low2': [
         Event(EventType.Notification, 'blink', 3, RED),
     ],
     'cheevo': [
@@ -27,6 +39,7 @@ presets = {
 }
 
 def run_preset_effect(preset):
+    print(f"[animation] preset: [{preset}]")
     STATE.events.append(Event(EventType.FadeOut))
     for e in preset:
         STATE.events.append(deepcopy(e))
@@ -69,27 +82,52 @@ def animation():
 @route("/update-battery-state", method='POST')
 def battery():
     req = request.body.read().decode().split() # pyright: ignore[reportAttributeAccessIssue]
-    STATE.DEV.BATTERY['percentage'] = int(req[0])
+
+    last_pct = STATE.DEV.BATTERY['percentage']
+    cur_pct = int(req[0])
+
+    thresh_pct = CONFIG["battery.low.threshold"]
 
     last_state = STATE.DEV.BATTERY['state']
+    cur_state = req[1]
 
-    if CONFIG['battery.charging'] == 'notification': # notification mode
-        if req[1] != last_state and req[1] == 'Charging':
+    print(f"[bat] [{last_pct}/{last_state}] -> [{cur_pct}/{cur_state}]")
+
+    if CONFIG['battery.charging'] == 'notification' and cur_state != last_state: # notification mode
+        if cur_state == 'Charging':
             run_preset_effect(presets['battery_charging'])
-        if req[1] != last_state and req[1] == 'Full':
+        if cur_state == 'Full':
             run_preset_effect(presets['battery_full'])
-        if req[1] != last_state:
-            STATE.events.append(Event(EventType.RemoveLayer, 'charging'))
-    elif CONFIG['battery.charging'] == 'continuous':
-        if req[1] != last_state:
-            if req[1] == 'Charging':
+        if cur_state == 'Discharging':
+            if STATE.DEV.BATTERY['percentage'] < 5:
+                run_preset_effect(presets['battery_discharging1'])
+            elif STATE.DEV.BATTERY['percentage'] < 50:
+                run_preset_effect(presets['battery_discharging2'])
+            else:
+                run_preset_effect(presets['battery_discharging3'])
+        STATE.events.append(Event(EventType.RemoveLayer, 'charging'))
+    elif CONFIG['battery.charging'] == 'continuous' and cur_state != last_state:
+        if cur_state != last_state:
+            if cur_state == 'Charging':
                 STATE.events.append(Event(EventType.AddLayer, 'charging'))
             else:
                 STATE.events.append(Event(EventType.RemoveLayer, 'charging'))
-    else:
+    elif cur_state != last_state:
         STATE.events.append(Event(EventType.RemoveLayer, 'charging'))
 
-    STATE.DEV.BATTERY['state'] = req[1]
+    if CONFIG['battery.low'] == 'notification' and cur_state == 'Discharging' and cur_pct != last_pct:
+        if cur_pct <= thresh_pct:
+            run_preset_effect(presets['battery_low1'])
+        elif cur_pct <= 5:
+            run_preset_effect(presets['battery_low2'])
+    elif CONFIG['battery.low'] == 'continuous' and cur_state == 'Discharging' and (cur_pct != last_pct or cur_state != last_state):
+        if cur_pct <= thresh_pct:
+            STATE.events.append(Event(EventType.AddLayer, 'bat_low'))
+    elif cur_state != 'Discharging' or cur_pct > thresh_pct:
+        STATE.events.append(Event(EventType.RemoveLayer, 'bat_low'))
+
+    STATE.DEV.BATTERY['state'] = cur_state
+    STATE.DEV.BATTERY['percentage'] = cur_pct
 
 @route("/update-screen-state", method='POST')
 def screen():
@@ -104,6 +142,8 @@ def screen():
 @get("/kill")
 def kill():
     STATE.events.append(Event(EventType.FadeOut))
+    #STATE.events.append(Event(EventType.Notification, 'blink_on', 1, WHITE))
+    #STATE.events.append(Event(EventType.Notification, 'round_back', 1, WHITE))
     STATE.events.append(Event(EventType.Die))
 
 @get("/get-settings")
@@ -147,7 +187,7 @@ def get_palettes():
 
 def run_api():
     print("Starting HTTP Daemon: http://localhost:1235/")
-    run(host='localhost', port=1235, quiet=False)
+    run(host='localhost', port=1235, quiet=True)
 
 if __name__ == '__main__':
     run_api()

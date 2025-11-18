@@ -3,7 +3,7 @@ from device import Device
 from utilities import dimm, easeOutQuart
 
 _metadata = {
-    'name': 'Notification Round',
+    'name': 'Notification Round Back',
     'reqs': [],
     'duration': 30
 }
@@ -13,7 +13,7 @@ class Effect(BaseEffect):
         super().__init__(dev, initial_tick)
     
     def apply(self, t, palettes):
-        t = t-self._TICK + 0
+        t = 29 - (t - self._TICK)
         c = dimm(palettes[0].fg, min(t/20, 1))
         #c = palettes[0].fg
         for z in self.dev.Z.Rings:

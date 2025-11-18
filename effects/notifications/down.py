@@ -3,7 +3,7 @@ from device import Device
 from utilities import loop_d, dimm
 
 _metadata = {
-    'name': 'Notification Up',
+    'name': 'Notification Down',
     'reqs': [],
     'duration': 23
 }
@@ -13,7 +13,7 @@ class Effect(BaseEffect):
         super().__init__(dev, initial_tick)
     
     def apply(self, t, palettes):
-        t = t-self._TICK + 0
+        t = 21 - (t - self._TICK)
         for z in self.dev.Z.Rings:
             p = palettes[z.PAL_ID]
             for x in range(z.COUNT):
@@ -27,4 +27,4 @@ class Effect(BaseEffect):
             z.all([0,0,0])
     
     def framekey(self, t):
-        return t-self._TICK + 0
+        return 21 - (t - self._TICK)

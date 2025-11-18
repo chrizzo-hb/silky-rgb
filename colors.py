@@ -45,6 +45,7 @@ class Palette():
 GREEN = Palette([0,1,0])
 RED = Palette([1,0,0])
 BLUE = Palette([0,0,1])
+AMBER = Palette([1,0.8,0])
 WHITE = Palette([1,1,1])
 BLACK = Palette([0,0,0])
 

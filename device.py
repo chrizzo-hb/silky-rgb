@@ -30,7 +30,7 @@ class Device:
 
         self.BATTERY = {
             'percentage': 0,
-            'state': ''
+            'state': 'Discharging'
         }
 
         self.TRAITS = []

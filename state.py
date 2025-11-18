@@ -56,18 +56,23 @@ class RGBState:
             self._idle = False
             event = self.events[0]
             if event.type == EventType.LoadConfig:
+                print(f"[state] LoadConfig")
                 self.load_config()
                 self.events.pop(0)
+                return True
             if event.type == EventType.Die:
+                print(f"[state] Die")
                 self.DEV.close()
                 quit()
             if event.type == EventType.FadeIn:
+                print(f"[state] FadeIn")
                 self.DEV.nuke_savestates()
                 self._target_tr = MAX_BR
                 self.events.pop(0)
                 return True
             if event.type == EventType.FadeOut:
                 if not event.running:
+                    print(f"[state] FadeOut")
                     self.DEV.nuke_savestates()
                     self._target_tr = 0
                     event.running = True
@@ -76,6 +81,7 @@ class RGBState:
                     event.timer -= 1
                     if event.timer == 0:
                         self.events.pop(0)
+                        return True
             if event.type == EventType.AddLayer:
                 if not event.running:
                     running = False
@@ -83,6 +89,7 @@ class RGBState:
                         if self.modes[i].__class__ is STATES[event.payload]['class']:
                             running = True
                     if not running:
+                        print(f"[state] AddLayer [{event.payload}]")
                         event.running = True
                         self._target_tr = 0
                         self.DEV.nuke_savestates()
@@ -95,24 +102,28 @@ class RGBState:
 
             if event.type == EventType.RemoveLayer:
                 if not event.running:
-                    for i in range(len(self.modes)):
-                        if self.modes[i].__class__ is STATES[event.payload]['class']:
+                    for m in self.modes:
+                        if m.__class__ is STATES[event.payload]['class']:
                             event.running = True
+                            print(f"[state] RemoveLayer [{event.payload}]")
                             self._target_tr = 0
                 
                 if not event.running:
                     self.events.pop(0)
+                    return True
 
                 if event.running and self._tr == 0:
                     self.events.pop(0)
                     for i in range(len(self.modes)):
                         if self.modes[i].__class__ is STATES[event.payload]['class']:
                             self.modes.pop(i)
+                            break
                     self.DEV.nuke_savestates()
                     self._target_tr = MAX_BR
-
+                    return True
 
             if event.type == EventType.ChangeMode:
+                print(f"[state] ChangeMode [{event.payload}]")
                 self.modes[0] = MODES[event.payload]['class'](self.DEV, self._tick)
                 self._tr = 0
                 self.events.pop(0)
@@ -120,6 +131,7 @@ class RGBState:
                 self.events.append(Event(EventType.FadeIn))
             if event.type == EventType.Notification:
                 if not event.running:
+                    print(f"[state] Notification [{event.payload}]")
                     self.DEV.nuke_savestates()
                     self._tr = MAX_BR
                     self._target_tr = MAX_BR
@@ -145,6 +157,7 @@ class RGBState:
         return self._palette
 
     def render(self, TICK):
+        #print("[render]", TICK, self._tr)
         self._tick = TICK
         while self.manage_events(): pass
         mode = self.modes[-1]

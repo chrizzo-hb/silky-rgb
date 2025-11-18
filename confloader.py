@@ -44,7 +44,7 @@ conf_map = {
     },
     "battery.low": {
         "type": "enum",
-        "values": ["off", "notification", "continous"]
+        "values": ["off", "notification", "continuous"]
     },
     "battery.low.threshold": {
         "type": "int",
@@ -99,8 +99,8 @@ def set_option(key:str, val:str):
                 CONFIG["battery.charging"] = val
         
         if key == "battery.low":
-            if val in conf_map['battery.charging']['values']:
-                CONFIG["battery.charging"] = val
+            if val in conf_map['battery.low']['values']:
+                CONFIG["battery.low"] = val
 
     except:
         pass
