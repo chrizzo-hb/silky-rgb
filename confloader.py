@@ -52,7 +52,7 @@ conf_map = {
     },
     "battery.charging": {
         "type": "enum",
-        "values": ["off", "notification", "continous"]
+        "values": ["off", "notification", "continuous"]
     }
 }
 
@@ -93,6 +93,14 @@ def set_option(key:str, val:str):
 
         if key == "palette.swap.secondary":
             CONFIG["palette.swap.secondary"] = val == '1'
+
+        if key == "battery.charging":
+            if val in conf_map['battery.charging']['values']:
+                CONFIG["battery.charging"] = val
+        
+        if key == "battery.low":
+            if val in conf_map['battery.charging']['values']:
+                CONFIG["battery.charging"] = val
 
     except:
         pass

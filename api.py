@@ -48,7 +48,7 @@ def set_config():
 @route("/animation", method='POST')
 def animation():
     req = request.body.read().decode() # pyright: ignore[reportAttributeAccessIssue]
-    if req == 'charging':
+    if req == 'battery_charging':
         run_preset_effect(presets['battery_charging'])
     elif req == 'cheevo':
         run_preset_effect(presets['cheevo'])
@@ -73,19 +73,21 @@ def battery():
 
     last_state = STATE.DEV.BATTERY['state']
 
-    if not CONFIG['charging_notification']: # notification mode
+    if CONFIG['battery.charging'] == 'notification': # notification mode
         if req[1] != last_state and req[1] == 'Charging':
             run_preset_effect(presets['battery_charging'])
         if req[1] != last_state and req[1] == 'Full':
             run_preset_effect(presets['battery_full'])
         if req[1] != last_state:
             STATE.events.append(Event(EventType.RemoveLayer, 'charging'))
-    else:
+    elif CONFIG['battery.charging'] == 'continuous':
         if req[1] != last_state:
             if req[1] == 'Charging':
                 STATE.events.append(Event(EventType.AddLayer, 'charging'))
             else:
                 STATE.events.append(Event(EventType.RemoveLayer, 'charging'))
+    else:
+        STATE.events.append(Event(EventType.RemoveLayer, 'charging'))
 
     STATE.DEV.BATTERY['state'] = req[1]
 
@@ -116,7 +118,7 @@ def settings():
         if add:
             c[k] = v
 
-    return dumps(conf_map, indent=4)+"\n"
+    return dumps(c, indent=4)+"\n"
 
 @get("/get-modes")
 def get_modes():
@@ -145,7 +147,7 @@ def get_palettes():
 
 def run_api():
     print("Starting HTTP Daemon: http://localhost:1235/")
-    run(host='localhost', port=1235, quiet=True)
+    run(host='localhost', port=1235, quiet=False)
 
 if __name__ == '__main__':
     run_api()
