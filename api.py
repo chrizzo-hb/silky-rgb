@@ -1,9 +1,9 @@
 from bottle import run, route, get, request
 from colors import AMBER, BLUE, GREEN, PALETTES, RED, WHITE, Palette
 from confloader import CONFIG, conf_map, read_config_knulli, set_option
-from effects.effect_store import MODES
+from effects.effect_store import MODES, NOTIS
 from state import RGBState, Event, EventType
-from utilities import hex_to_rgb
+from utilities import Color, hex_to_rgb
 from copy import deepcopy
 from json import dumps
 
@@ -41,7 +41,7 @@ presets = {
 def run_preset_effect(preset):
     print(f"[animation] preset: [{preset}]")
     STATE.events.append(Event(EventType.FadeOut))
-    for e in preset:
+    for e in presets[preset]:
         STATE.events.append(deepcopy(e))
     STATE.events.append(Event(EventType.FadeIn))
 
@@ -60,22 +60,27 @@ def set_config():
 
 @route("/animation", method='POST')
 def animation():
-    req = request.body.read().decode() # pyright: ignore[reportAttributeAccessIssue]
-    if req == 'battery_charging':
-        run_preset_effect(presets['battery_charging'])
-    elif req == 'cheevo':
-        run_preset_effect(presets['cheevo'])
-    elif req == 'battery_low':
-        run_preset_effect(presets['battery_low'])
-    elif req == 'battery_full':
-        run_preset_effect(presets['battery_full'])
-    else:
-        req_ = req.split()
-        try:
-            if len(req_):
-                STATE.events.append(Event(EventType.FadeOut))
-        except Exception as e:
-            return "Error while processing Command:\n[name] [count] [hex_color]\n"
+    req = request.body.read().decode().split(";") # pyright: ignore[reportAttributeAccessIssue]
+
+    command_list = []
+
+    for com in req:
+        com2 = com.strip()
+        if com2 in presets:
+            run_preset_effect(com2)
+        else:
+            try:
+                n, c, hex_ = com2.split()
+                command_list.append(Event(EventType.Notification, n, int(c), Palette(hex_to_rgb(hex_))))
+            except Exception as e:
+                return "Error while processing Command:\n[name] [count] [hex_color]\n"
+            
+    if len(command_list) > 0:
+        STATE.events.append(Event(EventType.FadeOut))
+        for c in command_list:
+            STATE.events.append(c)
+        STATE.events.append(Event(EventType.FadeIn))
+
     return ""
 
 
@@ -164,6 +169,21 @@ def settings():
 def get_modes():
     m = {}
     for k, v in MODES.items():
+        add = True
+        if "reqs" in v["metadata"]:
+            for r in v["metadata"]["reqs"]:
+                if r not in STATE.DEV.TRAITS:
+                    add = False
+        if add:
+            m[k] = {
+                "name": v["metadata"]["name"]
+            }
+    return dumps(m, indent=4)+"\n"
+
+@get("/get-animations")
+def get_anim():
+    m = {}
+    for k, v in NOTIS.items():
         add = True
         if "reqs" in v["metadata"]:
             for r in v["metadata"]["reqs"]:

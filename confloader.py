@@ -85,6 +85,10 @@ def set_option(key:str, val:str):
             if val.isnumeric() and bounds(int(val), conf_map['brightness']['range']):
                 CONFIG["brightness"] = int(val)
 
+        if key == "battery.low.threshold":
+            if val.isnumeric() and bounds(int(val), conf_map['battery.low.threshold']['range']):
+                CONFIG["battery.low.threshold"] = int(val)
+
         if key == "brightness.adaptive":
             CONFIG["brightness.adaptive"] = val == '1'
 

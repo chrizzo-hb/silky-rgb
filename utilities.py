@@ -26,9 +26,9 @@ def generate_brightness_list(size, max_val):
         if brightness_list[i] < i: brightness_list[i] = i
     return brightness_list
 
-def hex_to_rgb(hex_color):
+def hex_to_rgb(hex_color: str) -> Color:
     hex_color = hex_color.lstrip('#')
-    return [int(hex_color[i:i+2], 16) for i in (0, 2, 4)]
+    return [int(hex_color[i:i+2], 16)/255 for i in (0, 2, 4)]
 
 def loop_d(a, b, loop):
     v = abs(a-b)
