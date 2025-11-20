@@ -11,6 +11,7 @@ CONFIG = {
     "brightness.adaptive": False,
     "palette": "Knulli",
     "palette.swap": False,
+    "palette.stealth": False,
     "palette.swap.secondary": False,
     "retroachievements": True,
     "battery.low": "notification",
@@ -33,6 +34,9 @@ conf_map = {
         "type": "string"
     },
     "palette.swap": {
+        "type": "bool"
+    },
+    "palette.stealth": {
         "type": "bool"
     },
     "palette.swap.secondary": {
@@ -94,6 +98,9 @@ def set_option(key:str, val:str):
 
         if key == "palette.swap":
             CONFIG["palette.swap"] = val == '1'
+
+        if key == "palette.stealth":
+            CONFIG["palette.stealth"] = val == '1'
 
         if key == "palette.swap.secondary":
             CONFIG["palette.swap.secondary"] = val == '1'

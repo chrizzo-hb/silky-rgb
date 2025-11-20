@@ -27,7 +27,7 @@ class Effect(BaseEffect):
                 prog = sin100(int(wave_val * 100))
                 
                 # Mix the foreground and background colors based on the wave progression
-                z[i] = mix(p.bg, 1 - (prog), p.fg, prog)
+                z[i] = mix(p.fg, 1 - (prog), p.bg, prog)
     
     def framekey(self, t):
         wave_speed = 60

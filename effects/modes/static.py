@@ -13,7 +13,7 @@ class Effect(BaseEffect):
     def apply(self, t, palettes):
         for z in self.dev.A:
             p = palettes[z.PAL_ID]
-            z.all(p.bg)
+            z.all(p.fg)
     
     def framekey(self, t):
         return 0

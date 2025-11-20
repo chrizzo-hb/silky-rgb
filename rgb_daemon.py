@@ -1,4 +1,3 @@
-import device
 from time import time_ns, sleep
 import threading
 from api import run_api
@@ -47,10 +46,17 @@ def main():
         
         TICK = int(nTICK)
 
+def wrapper():
+    while True:
+        try:
+            main()
+        except Exception as e:
+            print(e.with_traceback(None))
+
 if False:
     main()
 else:
-    t1 = threading.Thread(target=main)
+    t1 = threading.Thread(target=wrapper)
     t2 = threading.Thread(target=run_api, daemon=True)
 
     t1.start()

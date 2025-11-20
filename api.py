@@ -100,16 +100,16 @@ def battery():
 
     if CONFIG['battery.charging'] == 'notification' and cur_state != last_state: # notification mode
         if cur_state == 'Charging':
-            run_preset_effect(presets['battery_charging'])
+            run_preset_effect('battery_charging')
         if cur_state == 'Full':
-            run_preset_effect(presets['battery_full'])
+            run_preset_effect('battery_full')
         if cur_state == 'Discharging':
             if STATE.DEV.BATTERY['percentage'] < 5:
-                run_preset_effect(presets['battery_discharging1'])
+                run_preset_effect('battery_discharging1')
             elif STATE.DEV.BATTERY['percentage'] < 50:
-                run_preset_effect(presets['battery_discharging2'])
+                run_preset_effect('battery_discharging2')
             else:
-                run_preset_effect(presets['battery_discharging3'])
+                run_preset_effect('battery_discharging3')
         STATE.events.append(Event(EventType.RemoveLayer, 'charging'))
     elif CONFIG['battery.charging'] == 'continuous' and cur_state != last_state:
         if cur_state != last_state:
@@ -122,9 +122,9 @@ def battery():
 
     if CONFIG['battery.low'] == 'notification' and cur_state == 'Discharging' and cur_pct != last_pct:
         if cur_pct <= thresh_pct:
-            run_preset_effect(presets['battery_low1'])
+            run_preset_effect('battery_low1')
         elif cur_pct <= 5:
-            run_preset_effect(presets['battery_low2'])
+            run_preset_effect('battery_low2')
     elif CONFIG['battery.low'] == 'continuous' and cur_state == 'Discharging' and (cur_pct != last_pct or cur_state != last_state):
         if cur_pct <= thresh_pct:
             STATE.events.append(Event(EventType.AddLayer, 'bat_low'))
