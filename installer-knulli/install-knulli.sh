@@ -51,6 +51,8 @@ fi
 
 # Remove a previous version of the Silky RGB service
 if [ -f /etc/init.d/S98rgbled ]; then
+  echo "Shutting down previous Silky RGB service"
+  /etc/init.d/S98rgbled stop
   echo "Removing previous Silky RGB service"
   rm -f /etc/init.d/S98rgbled
 fi
@@ -80,3 +82,6 @@ fi
 cp ./rgb.sh /usr/share/emulationstation/scripts/achievements/rgb.sh
 
 knulli-save-overlay
+
+echo "Launching Silky RGB service"
+/etc/init.d/S98rgbled start
