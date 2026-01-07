@@ -15,7 +15,7 @@ def identify_device():
 
 config = json.load(open(os.path.dirname(__file__)+'/device_configs/'+identify_device()+'.json'))
 
-RGBDriver = import_module("drivers."+config['driver']).RGBDriver
+RGBDriver = import_module("silkyrgb.drivers."+config['driver']).RGBDriver
 
 print("Loaded Driver:", config['driver']) # pyright: ignore[reportPossiblyUnboundVariable]
 
